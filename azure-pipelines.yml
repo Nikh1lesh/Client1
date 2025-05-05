@@ -7,38 +7,46 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
-# Build Stage
 - stage: BuildFrontend
   displayName: 'Build Frontend'
   jobs:
-  - job: BuildJob
-    displayName: 'Install & Build'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '14.x'
-      displayName: 'Install Node.js'
+    - job: BuildJob
+      displayName: 'Install & Build React App'
+      steps:
+        # Step 1: Install Node.js
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '16.x'  # Recommended for React 19+
+          displayName: 'Install Node.js'
 
-    - script: npm install
-      workingDirectory: 'Client1'
-      displayName: 'Install Frontend Dependencies'
+        # Step 2: Install dependencies
+        - script: |
+            echo "Installing dependencies..."
+            npm install
+          workingDirectory: 'Client1'
+          displayName: 'Install Frontend Dependencies'
 
-    - script: npm run build
-      workingDirectory: 'Client1'
-      displayName: 'Build Frontend'
+        # Step 3: Build the React app
+        - script: |
+            echo "Building the app..."
+            npm run build
+          workingDirectory: 'Client1'
+          displayName: 'Build Frontend'
 
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: 'Client1/build'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/frontend.zip'
-        replaceExistingArchive: true
-      displayName: 'Archive Frontend Build'
+        # Step 4: Archive the build folder
+        - task: ArchiveFiles@2
+          inputs:
+            rootFolderOrFile: 'Client1/build'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/frontend.zip'
+            replaceExistingArchive: true
+          displayName: 'Archive Frontend Build'
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
-      displayName: 'Publish Artifact'
+        # Step 5: Publish the build artifact
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            ArtifactName: 'drop'
+            publishLocation: 'Container'
+          displayName: 'Publish Artifact'
