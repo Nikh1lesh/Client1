@@ -20,7 +20,7 @@ stages:
       displayName: 'Install Node.js'
 
     - script: npm install
-      workingDirectory: 'Product-Catalog/Client'
+      workingDirectory: 'Client1'
       displayName: 'Install Frontend Dependencies'
 
     - script: npm run build
